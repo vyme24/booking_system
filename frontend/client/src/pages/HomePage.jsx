@@ -1,6 +1,5 @@
 import React from "react";
 import Loader from "../components/Loader/Loader";
-import Header from "../components/Header/Header";
 import HeroSection from "../components/HeroSection/HeroSection";
 import DestinationSection from "../components/Destination/DestinationSection";
 import BenefitSection from "../components/Benefits/BenefitSection";
@@ -11,7 +10,6 @@ import VideoSection from "../components/Video/VideoSection";
 import TestimonialSection from "../components/Testimonial/TestimonialSection";
 import FAQSection from "../components/FAQ/FAQSection";
 import BlogSection from "../components/Blog/BlogSection";
-import Footer from "../components/Footer/Footer";
 import RegisterModal from "../components/Modal/RegisterModal";
 import LoginModal from "../components/Modal/LoginModal";
 import ForgotPasswordModal from "../components/Modal/ForgotPasswordModal";
@@ -36,9 +34,7 @@ const HomePage = () => {
 
   return (
     <>
-      <Header />
-
-      <main id="top">
+        <main id="top">
         <HeroSection />
         <DestinationSection />
         <BenefitSection />
@@ -53,13 +49,6 @@ const HomePage = () => {
         <BlogSection />
         <SupportSection />
       </main>
-
-      <Footer />
-
-      {/* Modals */}
-      <LoginModal />
-      <RegisterModal />
-      <ForgotPasswordModal />
 
       {/* Back to top */}
       <Cursor />

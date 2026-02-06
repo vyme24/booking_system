@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import LoginModal from "../Modal/LoginModal";
+import { Link } from 'react-router-dom';
 
 
 
@@ -915,14 +915,12 @@ const Header = () => {
               </a>
             </div>
             <div>
-              <a
-                href="#"
+              <Link
+                to={"/auth/login"}
                 className="btn btn-white me-3"
-                data-bs-toggle="modal"
-                data-bs-target="#login-modal"
               >
                 Sign In
-              </a>
+              </Link>
             </div>
             <a href="become-an-expert.html" className="btn btn-primary me-0">
               Become Expert
@@ -937,11 +935,6 @@ const Header = () => {
       </div>
     </div>
   </header>
-  {showLogin && (
-  <LoginModal onClose={() => setShowLogin(false)} />
-)}
-
-  {/* /Header */}
 </div>
 
 
