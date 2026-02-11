@@ -5,9 +5,11 @@ import LoginPage from "./pages/auth/Login";
 import AuthLayout from "./layouts/AuthLayout";
 import RegisterPage from "./pages/auth/Register";
 import ForgotPage from "./pages/auth/ForgotPassword";
+import {Toaster} from "react-hot-toast"
 
 function App() {
   return (
+<>
     <BrowserRouter>
       <Routes>
        <Route path="/" element={<AppLayout/>}>
@@ -20,6 +22,8 @@ function App() {
           </Route>
       </Routes>
     </BrowserRouter>
+    <Toaster position="top-center"  reverseOrder={false}/>
+    </>
   );
 }
 

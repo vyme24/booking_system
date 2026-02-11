@@ -13,7 +13,7 @@ const register = async(req,res) => {
     const Exist = await User.findOne({email});
 
     if(Exist){
-      return res.status(201).json({status: true, message: "User Exist"})
+      return res.status(404).json({status: true, message: "User Exist"})
     }
 
     const hashPassword =  await bcryptjs.hash(password,16);

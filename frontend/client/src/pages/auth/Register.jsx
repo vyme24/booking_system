@@ -1,7 +1,53 @@
 import { Link } from "react-router-dom"
 import SocialAuth from "../../components/Auth/SocialAuth"
+import { useState } from "react"
+import {useRegisterMutation} from "../../services/authService"
+import { useEffect } from "react"
+import toast from "react-hot-toast"
 
 const RegisterPage = () => {
+
+  const [register, {isLoading,isError,error,isSuccess, data}] = useRegisterMutation();
+
+
+  useEffect(() => {
+
+    if(isSuccess && data ){
+     console.log("success",data)
+     toast.success(data.message)
+     setForm(null)
+    }
+    if(error){
+      toast.error(error.data.message)
+    }
+
+  },[isLoading,isSuccess,isError,error, data])
+
+ 
+
+  const [form, setForm] = useState({
+    first_name: "",
+    last_name:"",
+    email: "",
+    password:""
+  });
+
+
+  const handleChange = (e) => {
+    const {name, value} = e.target
+
+    setForm(prev => ({
+      ...prev,
+      [name]: value
+      })
+    )
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await register(form).unwrap();
+
+  }
 
     return (
         <>
@@ -13,20 +59,42 @@ const RegisterPage = () => {
     </div>
   </div>
   <div className="card-body">
-    <form action="login.html">
-      <div className="mb-3">
-        <label className="form-label">Name</label>
+    <form method="POST" onSubmit={handleSubmit}>
+    <div className="d-flex gap-2">
+        <div className="mb-3">
+        <label className="form-label">First Name</label>
         <div className="input-icon">
           <span className="input-icon-addon">
             <i className="isax isax-user" />
           </span>
           <input
             type="text"
+            name="first_name"
             className="form-control form-control-lg"
-            placeholder="Enter Full Name"
+            placeholder="Enter First Name"
+            value={form.first_name}
+            onChange={handleChange}
           />
         </div>
       </div>
+        <div className="mb-3">
+        <label className="form-label">Last Name</label>
+        <div className="input-icon">
+          <span className="input-icon-addon">
+            <i className="isax isax-user" />
+          </span>
+          <input
+            type="text"
+              name="last_name"
+            className="form-control form-control-lg"
+            placeholder="Enter Last Name"
+            value={form.last_name}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
+
+    </div>
       <div className="mb-3">
         <label className="form-label">Email</label>
         <div className="input-icon">
@@ -35,8 +103,12 @@ const RegisterPage = () => {
           </span>
           <input
             type="email"
+              name="email"
             className="form-control form-control-lg"
             placeholder="Enter Email"
+            value={form.email}
+            onChange={handleChange}
+         
           />
         </div>
       </div>
@@ -48,30 +120,19 @@ const RegisterPage = () => {
           </span>
           <input
             type="password"
+              name="password"
             className="form-control form-control-lg pass-input"
             placeholder="Enter Password"
+             value={form.password}
+            onChange={handleChange}
+        
           />
           <span className="input-icon-addon toggle-password">
             <i className="isax isax-eye-slash" />
           </span>
         </div>
       </div>
-      <div className="mb-3">
-        <label className="form-label">Confirm Password</label>
-        <div className="input-icon">
-          <span className="input-icon-addon">
-            <i className="isax isax-lock" />
-          </span>
-          <input
-            type="password"
-            className="form-control form-control-lg pass-input"
-            placeholder="Enter Password"
-          />
-          <span className="input-icon-addon toggle-password">
-            <i className="isax isax-eye-slash" />
-          </span>
-        </div>
-      </div>
+     
       <div className="mt-3 mb-3">
         <div className="d-flex">
           <div className="form-check d-flex align-items-center mb-2">
@@ -99,9 +160,10 @@ const RegisterPage = () => {
       <div className="mb-3">
         <button
           type="submit"
+          disabled={isLoading}
           className="btn btn-xl btn-primary d-flex align-items-center justify-content-center w-100"
         >
-          Register
+          {isLoading ? "loading" : "Register"}
           <i className="isax isax-arrow-right-3 ms-2" />
         </button>
       </div>
