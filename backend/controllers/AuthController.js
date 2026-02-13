@@ -1,6 +1,8 @@
 const bcryptjs= require("bcryptjs")
-const jwt = require("jsonwebtoken")
+
 const User = require("../models/User");
+const { generateToken } = require("../services/jwt");
+const { sendResetPasswordEmail, resetPasswordEmail } = require("../services/mail");
 
 
 const register = async(req,res) => {
@@ -44,16 +46,64 @@ const login = async(req,res) => {
     if(!Exist){
       return res.status(404).json({status: true, message: "User Not Exist"})
     }
-    const token = jwt.sign(Exist.toObject(), process.env.JWT_SECRET)
+    const token = generateToken(Exist)
 
-    const User =await bcryptjs.compare(password,Exist.password)
-       if(!User){
-      return res.status(404).json({status: true, message: "User Not Exist", data : {token}})
+    const user =await bcryptjs.compare(password,Exist.password)
+       if(!user){
+      return res.status(404).json({status: true, message: "Invalid Credentials", data : {token}})
     }
 
 
    
-     return res.status(200).json({status: true, message: "Login Successfully"})
+     return res.status(200).json({status: true, message: "Login Successfully", data : {token}})
+   } catch (error) {
+     return res.status(500).json({status: false, message: error.message})
+   }
+}
+
+const forgotPassword = async(req,res) => {
+  try {
+    const {email} = req.body;
+    if(!email) {
+        throw Error("pls fill required input")
+    }
+
+    const Exist = await User.findOne({email});
+
+    if(Exist){
+         const resetToken = generateToken(Exist);
+         const resetLink = `${process.env.FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
+        await sendResetPasswordEmail(email, resetLink);
+    }
+     return res.status(200).json({status: true, message: "Password Reset Link Sent To Your Email"})
+   } catch (error) {
+     return res.status(500).json({status: false, message: error.message})
+   }
+}
+
+const resetPassword = async(req,res) => {
+  try {
+    const {password, confirm_password} = req.body;
+    if(!password || !confirm_password) {
+        throw Error("pls fill required input")
+    }
+    if(password !== confirm_password){
+      throw Error("Password and Confirm Password must be same")
+    }
+   console.log(req.user)
+    const Exist = await User.findById(req.user._id);
+
+    if(!Exist){
+      return res.status(404).json({status: true, message: "User Not Exist"})
+    }
+
+     const hashPassword =  await bcryptjs.hash(password,16);
+
+     await User.findOneAndUpdate({email:Exist.email}, {
+      password: hashPassword
+     })
+     await resetPasswordEmail(Exist.email, Exist)
+     return res.status(200).json({status: true, message: "Password Reset Successfully"})
    } catch (error) {
      return res.status(500).json({status: false, message: error.message})
    }
@@ -62,5 +112,7 @@ const login = async(req,res) => {
 
 module.exports = {
     register,
-    login
+    login,
+    forgotPassword,
+    resetPassword
 }

@@ -1,16 +1,17 @@
 import { Link } from "react-router-dom"
-import { useForgotPasswordMutation } from "../../services/authService";
+import { useForgotPasswordMutation, useResetPasswordMutation } from "../../services/authService";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-const ForgotPage = () => {
-   const [forgotPassword, {isLoading,isError,error,isSuccess, data}] = useForgotPasswordMutation();
-
+const ResetPasswordPage = () => {
+   const [resetPassword, {isLoading,isError,error,isSuccess, data}] = useResetPasswordMutation();
+   const token = window.location.search.split("token=")[1]
   useEffect(() => {
 
     if(isSuccess && data ){
      console.log("success",data)
      toast.success(data.message)
+     window.location.href = "/auth/login"
   
     }
     if(error){
@@ -20,7 +21,8 @@ const ForgotPage = () => {
   },[isLoading,isSuccess,isError,error, data])
 
   const [form, setForm] = useState({
-    email: "",
+    password: "",
+    confirm_password: ""
   });
 
   const handleChange = (e) => {
@@ -35,7 +37,15 @@ const ForgotPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await forgotPassword(form).unwrap();
+    if(!form.password || !form.confirm_password){
+      toast.error("pls fill required input")
+      return;
+    }
+    if(form.password !== form.confirm_password){
+      toast.error("Password and Confirm Password must be same")
+      return;
+    }
+    await resetPassword({body:form,token}).unwrap();
 
   }
 
@@ -44,24 +54,40 @@ const ForgotPage = () => {
       <div className="card authentication-card">
   <div className="card-header">
     <div className="text-center">
-      <h5 className="mb-1">Forgot Password</h5>
+      <h5 className="mb-1">Reset Password</h5>
       <p>Reset Your DreamsTour Password</p>
     </div>
   </div>
   <div className="card-body">
     <form onSubmit={handleSubmit} method="POST">
       <div className="mb-3">
-        <label className="form-label">Email</label>
+        <label className="form-label">Password</label>
         <div className="input-icon">
           <span className="input-icon-addon">
             <i className="isax isax-message" />
           </span>
           <input
-            type="email"
+            type="password"
             className="form-control form-control-lg"
-            placeholder="Enter Email"
-            name="email"
-            value={form.email}
+            placeholder="Enter Password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
+      <div className="mb-3">
+        <label className="form-label">Confirm Password</label>
+        <div className="input-icon">
+          <span className="input-icon-addon">
+            <i className="isax isax-message" />
+          </span>
+          <input
+            type="password"
+            className="form-control form-control-lg"
+            placeholder="Enter Confirm Password"
+            name="confirm_password"
+            value={form.confirm_password}
             onChange={handleChange}
           />
         </div>
@@ -72,7 +98,7 @@ const ForgotPage = () => {
           type="submit"
           className="btn btn-xl btn-primary d-flex align-items-center justify-content-center w-100"
         >
-         {isLoading ? "Loading..." : "Send Reset Link"}
+         {isLoading ? "Loading..." : "Reset Password"}
           <i className="isax isax-arrow-right-3 ms-2" />
         </button>
       </div>
@@ -93,4 +119,4 @@ const ForgotPage = () => {
 
 
 }
-export default ForgotPage
+export default ResetPasswordPage

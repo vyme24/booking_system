@@ -1,7 +1,45 @@
 import { Link } from "react-router-dom"
 import SocialAuth from "../../components/Auth/SocialAuth"
+import toast from "react-hot-toast";
+import { useLoginMutation } from "../../services/authService";
+import { useEffect, useState } from "react";
 
 const LoginPage = () => {
+  const [login, {isLoading,isError,error,isSuccess, data}] = useLoginMutation();
+
+  useEffect(() => {
+
+    if(isSuccess && data ){
+     console.log("success",data)
+     toast.success(data.message)
+     
+    }
+    if(error){
+      toast.error(error.data.message)
+    }
+
+  },[isLoading,isSuccess,isError,error, data])
+
+  const [form, setForm] = useState({
+    email: "",
+    password:""
+  });
+
+  const handleChange = (e) => {
+    const {name, value} = e.target
+
+    setForm(prev => ({
+      ...prev,
+      [name]: value
+      })
+    )
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await login(form).unwrap();
+
+  }
 
     return (
         <>
@@ -13,7 +51,7 @@ const LoginPage = () => {
               </div>
             </div>
             <div className="card-body">
-              <form action="index.html">
+              <form onSubmit={handleSubmit} method="POST">
                 <div className="mb-3">
                   <label className="form-label">Email</label>
                   <div className="input-icon">
@@ -24,6 +62,9 @@ const LoginPage = () => {
                       type="email"
                       className="form-control form-control-lg"
                       placeholder="Enter Email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
                     />
                   </div>
                 </div>
@@ -37,6 +78,9 @@ const LoginPage = () => {
                       type="password"
                       className="form-control form-control-lg pass-input"
                       placeholder="Enter Password"
+                      name="password"
+                      value={form.password}
+                      onChange={handleChange}
                     />
                     <span className="input-icon-addon toggle-password">
                       <i className="isax isax-eye-slash" />
@@ -70,9 +114,10 @@ const LoginPage = () => {
                 <div className="mb-3">
                   <button
                     type="submit"
+                    disabled={isLoading}
                     className="btn btn-xl btn-primary d-flex align-items-center justify-content-center w-100"
                   >
-                    Login
+                    {isLoading ? "Loading..." : "Sign In"}
                     <i className="isax isax-arrow-right-3 ms-2" />
                   </button>
                 </div>
