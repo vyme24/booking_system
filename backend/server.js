@@ -4,7 +4,8 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const connectDB = require("./libs/connectDB");
 dotenv.config({})
-
+const passport = require("passport");
+const session = require("express-session");
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
 
@@ -12,10 +13,17 @@ connectDB();
 
 //app
 const app = express();
+app.use(session({
+    secret: process.env.JWT_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  }));
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(cors())
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 //app routing
@@ -25,7 +33,11 @@ app.get("/",(req,res) => {
 
 
 const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+
+
 app.use("/auth", authRoutes)
+app.use("/user", userRoutes)
 
 
 

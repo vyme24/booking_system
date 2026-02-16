@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ekaruz/react-social-auth": "^0.0.4",
+    "@react-oauth/google": "^0.13.4",
     "@reduxjs/toolkit": "^2.11.2",
     "@tailwindcss/vite": "^4.1.18",
     "bootstrap": "^5.3.8",

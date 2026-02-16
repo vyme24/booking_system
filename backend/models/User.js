@@ -18,7 +18,6 @@ const UserSchema = new mongoose.Schema({
     },
       password: {
         type: String,
-        require: true
     },
       avatar: {
         type: String,
@@ -32,6 +31,15 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default :null
     },
+      googleId: {
+        type: String,
+        default: null
+    },
+     authType: {
+        type: String,
+        enum: ['local', 'google', "facebook"],
+        default: 'local'
+    }
 
 }, {timestamps: true})
 

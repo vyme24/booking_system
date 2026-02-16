@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useGetUserQuery } from '../../services/userService';
+import { useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 
 
@@ -8,6 +11,27 @@ const Header = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [offcanvasOpen, setOffcanvasOpen] = useState(false);
+   const token = localStorage.getItem("token")
+   const [user,setUser] = useState();
+  
+  const {isLoading, data, isError, isSuccess, error} = useGetUserQuery({},{skip:!token});
+
+  useEffect(() => {
+
+    if(isSuccess && data){
+      console.log(data.data)
+      setUser(data?.data)
+    }
+
+    if(error){
+       toast.error(error.data.message)
+        localStorage.removeItem("token")
+        window.location.href="/auth/login"
+     
+    }
+
+  },[isLoading, data, isError, isSuccess, error])
+
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -914,7 +938,9 @@ const Header = () => {
                 <i className="isax isax-sun-1" />
               </a>
             </div>
-            <div>
+           {!user && (
+            <>
+                 <div>
               <Link
                 to={"/auth/login"}
                 className="btn btn-white me-3"
@@ -924,7 +950,71 @@ const Header = () => {
             </div>
             <a href="become-an-expert.html" className="btn btn-primary me-0">
               Become Expert
-            </a>
+            </a></>
+           )}
+
+           {user && (
+            <>
+            <div className="dropdown profile-dropdown">
+  <a href="#" className="d-flex align-items-center" data-bs-toggle="dropdown">
+    <span className="avatar avatar-md">
+      <img
+        src={user.avatar}
+        alt="Img"
+        className="img-fluid rounded-circle border border-white border-4"
+      />
+    </span>
+   <p className='text-white px-2'> {user.first_name}  {user.last_name}</p>
+  </a>
+  <ul className="dropdown-menu dropdown-menu-end p-3">
+    <li>
+      <a
+        className="dropdown-item d-inline-flex align-items-center rounded fw-medium p-2"
+        href="dashboard.html"
+      >
+        Dashboard
+      </a>
+    </li>
+    <li>
+      <a
+        className="dropdown-item d-inline-flex align-items-center rounded fw-medium p-2"
+        href="customer-hotel-booking.html"
+      >
+        My Booking
+      </a>
+    </li>
+    <li>
+      <a
+        className="dropdown-item d-inline-flex align-items-center rounded fw-medium p-2"
+        href="my-profile.html"
+      >
+        My Profile
+      </a>
+    </li>
+    <li>
+      <hr className="dropdown-divider my-2" />
+    </li>
+    <li>
+      <a
+        className="dropdown-item d-inline-flex align-items-center rounded fw-medium p-2"
+        href="profile-settings.html"
+      >
+        Settings
+      </a>
+    </li>
+    <li>
+      <a
+        className="dropdown-item d-inline-flex align-items-center rounded fw-medium p-2"
+        href="login.html"
+      >
+        Logout
+      </a>
+    </li>
+  </ul>
+</div>
+<a href="add-hotel.html" class="btn btn-primary me-0">Add Listing</a>
+            </>
+           )}
             <div className="header__hamburger d-xl-none my-auto">
               <div className="sidebar-menu">
                 <i className="isax isax-menu5" />
