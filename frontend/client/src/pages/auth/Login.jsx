@@ -10,8 +10,12 @@ const LoginPage = () => {
   useEffect(() => {
 
     if(isSuccess && data ){
-     console.log("success",data)
-     toast.success(data.message)
+   //  console.log("success",data.data)
+     localStorage.setItem("token", data?.data?.token)
+      toast.success(data.message)
+     
+       window.location.href="/"
+   
      
     }
     if(error){
