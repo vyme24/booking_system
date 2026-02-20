@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import SocialAuth from "../../components/Auth/SocialAuth"
 import { useState } from "react"
 import {useRegisterMutation} from "../../services/authService"
@@ -9,12 +9,16 @@ const RegisterPage = () => {
 
   const [register, {isLoading,isError,error,isSuccess, data}] = useRegisterMutation();
 
+const [activeTab, setActiveTab] = useState("email");
+  const navigate = useNavigate();
 
   useEffect(() => {
 
     if(isSuccess && data ){
      console.log("success",data)
+     navigate("/auth/verify", {state : data.data})
      toast.success(data.message)
+
      setForm(null)
     }
     if(error){
@@ -29,6 +33,7 @@ const RegisterPage = () => {
     first_name: "",
     last_name:"",
     email: "",
+    mobile:"",
     password:""
   });
 
@@ -45,6 +50,21 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+     
+      if (!form.first_name)
+      return toast.error("First name required");
+     if (!form.last_name)
+      return toast.error("Last name required");
+
+     if (activeTab === "email" && !form.email)
+      return toast.error("Email required");
+
+    if (activeTab === "mobile" && !form.mobile)
+      return toast.error("Mobile required");
+
+      if (!form.password)
+      return toast.error("Password required");
+   
     await register(form).unwrap();
 
   }
@@ -59,6 +79,34 @@ const RegisterPage = () => {
     </div>
   </div>
   <div className="card-body">
+
+    <div className="auth-tabs mb-4">
+  <ul className="nav nav-pills nav-justified">
+    
+    <li className="nav-item">
+      <button
+        type="button"
+        className={`nav-link ${activeTab === "mobile" ? "active" : ""}`}
+        onClick={() => setActiveTab("mobile")}
+      >
+        <i className="isax isax-call me-2"></i>
+        Mobile
+      </button>
+    </li>
+
+    <li className="nav-item">
+      <button
+        type="button"
+        className={`nav-link ${activeTab === "email" ? "active" : ""}`}
+        onClick={() => setActiveTab("email")}
+      >
+        <i className="isax isax-message me-2"></i>
+        Email
+      </button>
+    </li>
+
+  </ul>
+</div>
     <form method="POST" onSubmit={handleSubmit}>
     <div className="d-flex gap-2">
         <div className="mb-3">
@@ -72,7 +120,7 @@ const RegisterPage = () => {
             name="first_name"
             className="form-control form-control-lg"
             placeholder="Enter First Name"
-            value={form.first_name}
+            value={form?.first_name}
             onChange={handleChange}
           />
         </div>
@@ -88,30 +136,56 @@ const RegisterPage = () => {
               name="last_name"
             className="form-control form-control-lg"
             placeholder="Enter Last Name"
-            value={form.last_name}
+            value={form?.last_name}
             onChange={handleChange}
           />
         </div>
       </div>
 
     </div>
-      <div className="mb-3">
-        <label className="form-label">Email</label>
-        <div className="input-icon">
-          <span className="input-icon-addon">
-            <i className="isax isax-message" />
-          </span>
-          <input
-            type="email"
-              name="email"
-            className="form-control form-control-lg"
-            placeholder="Enter Email"
-            value={form.email}
-            onChange={handleChange}
-         
-          />
-        </div>
-      </div>
+    
+    {activeTab === "email" && (
+  <div className="mb-3">
+    <label className="form-label">Email Address</label>
+
+    <div className="input-icon">
+      <span className="input-icon-addon">
+        <i className="isax isax-message"></i>
+      </span>
+
+      <input
+        type="email"
+        name="email"
+        className="form-control form-control-lg"
+        placeholder="Enter Email Address"
+        value={form?.email}
+        onChange={handleChange}
+      />
+    </div>
+  </div>
+)}
+
+{activeTab === "mobile" && (
+  <div className="mb-3">
+    <label className="form-label">Mobile Number</label>
+
+    <div className="input-icon">
+      <span className="input-icon-addon">
+        +91
+      </span>
+
+      <input
+        type="tel"
+        name="mobile"
+        className="form-control form-control-lg"
+        placeholder="Enter Mobile Number"
+        value={form?.mobile}
+        onChange={handleChange}
+        maxLength={10}
+      />
+    </div>
+  </div>
+)}
       <div className="mb-3">
         <label className="form-label">Password</label>
         <div className="input-icon">
@@ -123,7 +197,7 @@ const RegisterPage = () => {
               name="password"
             className="form-control form-control-lg pass-input"
             placeholder="Enter Password"
-             value={form.password}
+             value={form?.password}
             onChange={handleChange}
         
           />

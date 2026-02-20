@@ -8,6 +8,7 @@ import ForgotPage from "./pages/auth/ForgotPassword";
 import {Toaster} from "react-hot-toast"
 import ResetPasswordPage from "./pages/auth/resetPassword";
 import LoginSuccessPage from "./pages/auth/social/LoginSuccess";
+import VerifyPage from "./pages/auth/Verify";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
              <Route path="forgot-password" element={<ForgotPage/>}/>
               <Route path="reset-password" element={<ResetPasswordPage/>}/>
               <Route path="login/success" element={<LoginSuccessPage/>}/>
+              <Route path="verify" element={<VerifyPage/>}/>
           </Route>
       </Routes>
     </BrowserRouter>

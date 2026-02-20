@@ -14,22 +14,33 @@ const UserSchema = new mongoose.Schema({
     },
       email: {
         type: String,
-        require: true
+       unique: true, 
+       default:null, 
     },
       password: {
         type: String,
+        required:true
     },
       avatar: {
         type: String,
         default: null
     },
-      mobile: {
+     mobile: {
         type: String,
-        default: null
+        unique: true,
+        default:null
     },
       email_verify_at: {
         type: Date,
         default :null
+    },
+      mobile_verify_at: {
+        type: Date,
+        default :null
+    },
+     status: {
+        type: Boolean,
+        default: true
     },
       googleId: {
         type: String,

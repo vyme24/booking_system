@@ -3,16 +3,43 @@ const bcryptjs= require("bcryptjs")
 const User = require("../models/User");
 const { generateToken } = require("../services/jwt");
 const { sendResetPasswordEmail, resetPasswordEmail } = require("../services/mail");
+const { generateOTP } = require("../utils/otpHandler");
 
 
 const register = async(req,res) => {
    try {
-    const {first_name, last_name, email, password }= req.body;
-    if(!first_name && !last_name && !email && !password) {
+    const {first_name, last_name, email, password, mobile}= req.body;
+    if(!first_name || !last_name || !password) {
         throw Error("pls fill required input")
     }
+    const type = email ? "email" : "mobile";
+     
+    if(type === "email" && !email){ 
+           throw Error("Email is Required")
+   
+      }  
+      if(type === "mobile" && !mobile){ 
+           throw Error("Mobile is Required")
+   
+      }  
 
-    const Exist = await User.findOne({email});
+ 
+   
+    if(mobile && mobile.length !== 10){
+      throw Error("Mobile number must be 10 digits")
+    }
+    const Exist = await User.findOne({"$or":[{email}, {mobile}]});
+
+   
+    if(Exist && type == "mobile" && Exist.mobile_verify_at == null){
+          const otp = await generateOTP(type,Exist._id);
+          return res.status(200).json({status: true, message: `OTP sent on ${type} Successfully`, data : otp})
+    }
+
+    if(Exist && type == "email" && Exist.email_verify_at == null){
+        const otp = await generateOTP(type,Exist._id);
+          return res.status(200).json({status: true, message: `OTP sent on ${type} Successfully`, data : otp})
+    }
 
     if(Exist){
       return res.status(404).json({status: true, message: "User Exist"})
@@ -24,10 +51,11 @@ const register = async(req,res) => {
         first_name,
         last_name,
         email,
+        mobile,
         password: hashPassword
     })
-    
-     return res.status(200).json({status: true, message: "Register Successfully"})
+     const otp = await generateOTP(type,Exist._id);
+          return res.status(200).json({status: true, message: `OTP sent on ${type} Successfully`, data : otp})
    } catch (error) {
      return res.status(500).json({status: false, message: error.message})
    }

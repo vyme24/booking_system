@@ -19,6 +19,13 @@ export const authService = createApi({
                 body
             })
         }),
+         verify : builder.mutation({
+            query : (body) => ({
+                url :"/auth/verify",
+                method:"POST",
+                body
+            })
+        }),
         forgotPassword : builder.mutation({
             query : (body) => ({
                 url :"/auth/forgot-password",
@@ -39,4 +46,4 @@ export const authService = createApi({
 
 })
 
-export const {useLoginMutation, useRegisterMutation, useForgotPasswordMutation, useResetPasswordMutation } = authService
+export const {useLoginMutation, useVerifyMutation, useRegisterMutation, useForgotPasswordMutation, useResetPasswordMutation } = authService

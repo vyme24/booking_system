@@ -1,0 +1,30 @@
+// Download the helper library from https://www.twilio.com/docs/node/install
+const twilio = require("twilio"); // Or, for ESM: import twilio from "twilio";
+
+// Find your Account SID and Auth Token at twilio.com/console
+// and set the environment variables. See http://twil.io/secure
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio(accountSid, authToken);
+
+
+const sendMessage = async (mobile,msg) => {
+
+  try {
+    
+  const message = await client.messages.create({
+    body: msg,
+    from: "+16815006189",
+    to: "+91"+mobile,
+  });
+  console.log("msg", message)
+  return true
+  } catch (error) {
+      console.log(error)
+
+      return false
+  }
+
+}
+
+module.exports = sendMessage;
