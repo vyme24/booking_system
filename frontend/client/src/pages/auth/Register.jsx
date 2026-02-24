@@ -71,185 +71,146 @@ const [activeTab, setActiveTab] = useState("email");
 
     return (
         <>
-      <div className="card authentication-card">
-  <div className="card-header">
-    <div className="text-center">
-      <h5 className="mb-1">Sign Up</h5>
-      <p>Create your DreamsTour Account</p>
+    <div className="auth-wrapper d-flex align-items-center justify-content-center">
+  <div className="auth-card shadow-lg">
+
+    {/* Header */}
+    <div className="auth-header text-center">
+      <h4 className="fw-bold mb-1">Create Account</h4>
+      <p className="text-muted mb-0">Join DreamsTour & start exploring ✨</p>
     </div>
-  </div>
-  <div className="card-body">
 
-    <div className="auth-tabs mb-4">
-  <ul className="nav nav-pills nav-justified">
-    
-    <li className="nav-item">
-      <button
-        type="button"
-        className={`nav-link ${activeTab === "mobile" ? "active" : ""}`}
-        onClick={() => setActiveTab("mobile")}
-      >
-        <i className="isax isax-call me-2"></i>
-        Mobile
-      </button>
-    </li>
-
-    <li className="nav-item">
-      <button
-        type="button"
-        className={`nav-link ${activeTab === "email" ? "active" : ""}`}
-        onClick={() => setActiveTab("email")}
-      >
-        <i className="isax isax-message me-2"></i>
-        Email
-      </button>
-    </li>
-
-  </ul>
-</div>
-    <form method="POST" onSubmit={handleSubmit}>
-    <div className="d-flex gap-2">
-        <div className="mb-3">
-        <label className="form-label">First Name</label>
-        <div className="input-icon">
-          <span className="input-icon-addon">
-            <i className="isax isax-user" />
-          </span>
-          <input
-            type="text"
-            name="first_name"
-            className="form-control form-control-lg"
-            placeholder="Enter First Name"
-            value={form?.first_name}
-            onChange={handleChange}
-          />
-        </div>
+    {/* Tabs */}
+    <div className="auth-switch mt-4">
+      <div className="switch-pill">
+        <button
+          type="button"
+          className={`switch-btn ${activeTab === "mobile" ? "active" : ""}`}
+          onClick={() => setActiveTab("mobile")}
+        >
+          <i className="isax isax-call me-2"></i>Mobile
+        </button>
+        <button
+          type="button"
+          className={`switch-btn ${activeTab === "email" ? "active" : ""}`}
+          onClick={() => setActiveTab("email")}
+        >
+          <i className="isax isax-message me-2"></i>Email
+        </button>
       </div>
-        <div className="mb-3">
-        <label className="form-label">Last Name</label>
-        <div className="input-icon">
-          <span className="input-icon-addon">
-            <i className="isax isax-user" />
-          </span>
-          <input
-            type="text"
-              name="last_name"
-            className="form-control form-control-lg"
-            placeholder="Enter Last Name"
-            value={form?.last_name}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
-
     </div>
-    
-    {activeTab === "email" && (
-  <div className="mb-3">
-    <label className="form-label">Email Address</label>
 
-    <div className="input-icon">
-      <span className="input-icon-addon">
-        <i className="isax isax-message"></i>
-      </span>
+    {/* Form */}
+    <form className="mt-4" onSubmit={handleSubmit}>
 
-      <input
-        type="email"
-        name="email"
-        className="form-control form-control-lg"
-        placeholder="Enter Email Address"
-        value={form?.email}
-        onChange={handleChange}
-      />
-    </div>
-  </div>
-)}
-
-{activeTab === "mobile" && (
-  <div className="mb-3">
-    <label className="form-label">Mobile Number</label>
-
-    <div className="input-icon">
-      <span className="input-icon-addon">
-        +91
-      </span>
-
-      <input
-        type="tel"
-        name="mobile"
-        className="form-control form-control-lg"
-        placeholder="Enter Mobile Number"
-        value={form?.mobile}
-        onChange={handleChange}
-        maxLength={10}
-      />
-    </div>
-  </div>
-)}
-      <div className="mb-3">
-        <label className="form-label">Password</label>
-        <div className="input-icon">
-          <span className="input-icon-addon">
-            <i className="isax isax-lock" />
-          </span>
-          <input
-            type="password"
-              name="password"
-            className="form-control form-control-lg pass-input"
-            placeholder="Enter Password"
-             value={form?.password}
-            onChange={handleChange}
-        
-          />
-          <span className="input-icon-addon toggle-password">
-            <i className="isax isax-eye-slash" />
-          </span>
-        </div>
-      </div>
-     
-      <div className="mt-3 mb-3">
-        <div className="d-flex">
-          <div className="form-check d-flex align-items-center mb-2">
+      {/* Name Row */}
+      <div className="row g-3">
+        <div className="col-md-6">
+          <div className="form-floating">
             <input
-              className="form-check-input mt-0"
-              type="checkbox"
-              defaultValue=""
-              id="agree"
+              type="text"
+              name="first_name"
+              className="form-control"
+              placeholder="First Name"
+              value={form?.first_name}
+              onChange={handleChange}
             />
-            <label
-              className="form-check-label ms-2 text-gray-9 fs-14"
-              htmlFor="agree"
-            >
-              I agree with the&nbsp;
-              <a
-                href="terms-conditions.html"
-                className="link-primary fw-medium"
-              >
-                Terms Of Service.
-              </a>
-            </label>
+            <label>First Name</label>
+          </div>
+        </div>
+
+        <div className="col-md-6">
+          <div className="form-floating">
+            <input
+              type="text"
+              name="last_name"
+              className="form-control"
+              placeholder="Last Name"
+              value={form?.last_name}
+              onChange={handleChange}
+            />
+            <label>Last Name</label>
           </div>
         </div>
       </div>
-      <div className="mb-3">
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="btn btn-xl btn-primary d-flex align-items-center justify-content-center w-100"
-        >
-          {isLoading ? "loading" : "Register"}
-          <i className="isax isax-arrow-right-3 ms-2" />
-        </button>
+
+      {/* Email / Mobile */}
+      {activeTab === "email" && (
+        <div className="form-floating mt-3">
+          <input
+            type="email"
+            name="email"
+            className="form-control"
+            placeholder="Email Address"
+            value={form?.email}
+            onChange={handleChange}
+          />
+          <label>Email Address</label>
+        </div>
+      )}
+
+      {activeTab === "mobile" && (
+        <div className="input-group mt-3">
+          <span className="input-group-text bg-light">+91</span>
+          <div className="form-floating flex-grow-1">
+            <input
+              type="tel"
+              name="mobile"
+              className="form-control"
+              placeholder="Mobile Number"
+              value={form?.mobile}
+              onChange={handleChange}
+              maxLength={10}
+            />
+            <label>Mobile Number</label>
+          </div>
+        </div>
+      )}
+
+      {/* Password */}
+      <div className="form-floating mt-3 position-relative">
+        <input
+          type="password"
+          name="password"
+          className="form-control"
+          placeholder="Password"
+          value={form?.password}
+          onChange={handleChange}
+        />
+        <label>Password</label>
+        <span className="password-toggle">
+          <i className="isax isax-eye-slash"></i>
+        </span>
       </div>
-    <SocialAuth/>
-      <div className="d-flex justify-content-center">
-        <p className="fs-14">
-          Already have an account?{" "}
-          <Link to="/auth/login" className="link-primary fw-medium">
-            Sign In
-          </Link>
-        </p>
+
+      {/* Terms */}
+      <div className="form-check mt-3">
+        <input className="form-check-input" type="checkbox" id="agree" />
+        <label className="form-check-label small" htmlFor="agree">
+          I agree to the{" "}
+          <a href="terms-conditions.html" className="fw-semibold text-primary">
+            Terms of Service
+          </a>
+        </label>
       </div>
+
+      {/* Button */}
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="btn btn-primary w-100 mt-4 py-3 mb-2 fw-semibold rounded-pill"
+      >
+        {isLoading ? "Creating Account..." : "Create Account"}
+      </button>
+      <SocialAuth />
+
+      <p className="text-center small">
+        Already have an account?{" "}
+        <Link to="/auth/login" className="fw-semibold text-primary">
+          Sign In
+        </Link>
+      </p>
+
     </form>
   </div>
 </div>

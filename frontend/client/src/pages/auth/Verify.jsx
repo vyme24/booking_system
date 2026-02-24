@@ -1,129 +1,70 @@
+import { useNavigate , useLocation } from "react-router-dom";
+import { useVerifyMutation } from "../../services/authService"
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useVerifyMutation } from "../../services/authService";
 import toast from "react-hot-toast";
 
 const VerifyPage = () => {
-
-  const location = useLocation();
+  const [verifyOTP, {isLoading, isSuccess, isError, error, data}] = useVerifyMutation();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const { userId, type, expiresAt } = location.state || {};
+   const {userId, type, expiresAt} = location.state || {};
 
-  const [verify, { isLoading, isSuccess, error, data }] =
-    useVerifyMutation();
 
   const [form, setForm] = useState({
-    userId: "",
     otp: "",
-  });
-
-  const [timeLeft, setTimeLeft] = useState(0);
-
-  // redirect if no data
-  useEffect(() => {
-    if (!userId) navigate("/auth/login");
-  }, [userId]);
-
-  // set userid
-  useEffect(() => {
-    setForm(prev => ({ ...prev, userId }));
-  }, [userId]);
-
-  // countdown
-  useEffect(() => {
-    if (!expiresAt) return;
-
-    const expiry = new Date(expiresAt).getTime();
-
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const remaining = Math.max(
-        Math.floor((expiry - now) / 1000),
-        0
-      );
-
-      setTimeLeft(remaining);
-
-      if (remaining <= 0) {
-        clearInterval(timer);
-        toast.error("OTP Expired");
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [expiresAt]);
-
-  const formatTime = (sec) => {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m}:${s.toString().padStart(2, "0")}`;
-  };
+     
+  })
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+    const {name, value} = e.target
+
+    setForm(prev => ({
+      ...prev,
+      [name]: value
+      })
+    )
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (timeLeft <= 0)
-      return toast.error("OTP expired");
-
-    await verify(form).unwrap();
-  };
+    if(!form.otp){
+      return toast.error("OTP is required")
+    }
+    await verifyOTP({userId, otp: form.otp, type})
+  } 
 
   useEffect(() => {
-    if (isSuccess && data) {
-      toast.success(data.message);
-      localStorage.setItem("token", data.token);
-      navigate("/dashboard");
+    console.log("verify", userId, type)
+
+    if(isSuccess && data){
+      toast.success(data.message)
+      localStorage.setItem("token", data.data.token)
+      navigate("/")
     }
-
-    if (error) {
-      toast.error(error?.data?.message);
+    if(isError){
+      toast.error(error.data.message)
     }
-  }, [isSuccess, error]);
+  },[isLoading,isSuccess,isError,error, data])
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
 
-      <div className="bg-white p-8 rounded-xl border w-full max-w-md">
+    return (
+        <div className="auth-wrapper d-flex align-items-center justify-content-center">
+            <div className="auth-card shadow-lg">
+                <div className="auth-header text-center">
+                    <h2 className="mb-2">Verify Your Account</h2>
+                    <p className="text-muted mb-0">We emailed you the six digit code to cool down your account. Please enter the code below to confirm your email.</p>    
+                </div>
+                <form className="auth-form mt-4" onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                        <label htmlFor="verificationCode" className="form-label">Verification Code</label>
+                        <input type="number" className="form-control form-control-lg" id="verificationCode" name="otp" value={form.otp} onChange={handleChange} placeholder="Enter 6 digit code"/>
+                    </div>
+                    <button type="submit" className="btn btn-primary w-100 mt-4 py-3 fw-semibold rounded-pill">Verify Account</button>
+                </form>
+            </div>
+        </div>
+    )
+}
 
-        <h3 className="text-xl font-semibold text-center mb-2">
-          Verify OTP
-        </h3>
-
-        <p className="text-center text-gray-500 mb-6">
-          OTP sent on {type}
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-
-          <input
-            name="otp"
-            placeholder="Enter OTP"
-            value={form.otp}
-            onChange={handleChange}
-            className="w-full border rounded-lg px-3 py-3 text-center text-lg tracking-widest"
-          />
-
-          <p className="text-center text-sm text-gray-500">
-            Expires in {formatTime(timeLeft)}
-          </p>
-
-          <button
-            disabled={isLoading || timeLeft <= 0}
-            className="w-full bg-black text-white py-3 rounded-lg"
-          >
-            {isLoading ? "Verifying..." : "Verify OTP"}
-          </button>
-
-        </form>
-
-      </div>
-    </div>
-  );
-};
-
-export default VerifyPage;
+export default VerifyPage

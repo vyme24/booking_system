@@ -7,24 +7,22 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
 
+ const sendMessage  = async(mobile,message) => {
 
-const sendMessage = async (mobile,msg) => {
-
-  try {
-    
-  const message = await client.messages.create({
-    body: msg,
+    try {
+        
+ await client.messages.create({
+    body: message,
     from: "+16815006189",
     to: "+91"+mobile,
   });
-  console.log("msg", message)
+
+  console.log(message.body);
   return true
-  } catch (error) {
-      console.log(error)
-
-      return false
-  }
-
+    } catch (error) {
+         console.log("twilio",error)  
+         return false
+    }
 }
 
-module.exports = sendMessage;
+module.exports = {sendMessage}

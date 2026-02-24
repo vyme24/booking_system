@@ -24,14 +24,7 @@ return (
           />
           Google
         </button>
-        <button
-            onClick={() => handleSocial("facebook")}
-    
-          className="btn btn-light flex-fill d-flex align-items-center justify-content-center"
-        >
-          <img src="/assets/img/icons/fb-icon.svg" className="me-2" alt="Img" />
-          Facebook
-        </button>
+       
       </div>
 
    

@@ -3,7 +3,7 @@ const bcryptjs= require("bcryptjs")
 const User = require("../models/User");
 const { generateToken } = require("../services/jwt");
 const { sendResetPasswordEmail, resetPasswordEmail } = require("../services/mail");
-const { generateOTP } = require("../utils/otpHandler");
+const { generateOTP, verifyOTP } = require("../utils/otpHandler");
 
 
 const register = async(req,res) => {
@@ -64,26 +64,48 @@ const register = async(req,res) => {
 
 const login = async(req,res) => {
    try {
-    const {email, password }= req.body;
-    if(!email && !password) {
+    const {email, mobile, password }= req.body;
+
+        const type = email ? "email" : "mobile";
+     
+    if(type === "email" && !email){ 
+           throw Error("Email is Required")
+   
+      }  
+      if(type === "mobile" && !mobile){ 
+           throw Error("Mobile is Required")
+   
+      }  
+
+      if(!password) {
         throw Error("pls fill required input")
     }
-
-    const Exist = await User.findOne({email});
+   
+    const Exist = await User.findOne({"$or":[{email}, {mobile}]});
 
     if(!Exist){
       return res.status(404).json({status: true, message: "User Not Exist"})
     }
-    const token = generateToken(Exist)
+
+    if(type == "mobile" && Exist.mobile_verify_at == null){
+        return res.status(400).json({status: true, message: "Please verify your mobile number"})
+    }
+
+    if(type == "email" && Exist.email_verify_at == null){
+          return res.status(400).json({status: true, message: "Please verify your email"})
+    }
+
+    
 
     const user =await bcryptjs.compare(password,Exist.password)
        if(!user){
-      return res.status(404).json({status: true, message: "Invalid Credentials", data : {token}})
+      return res.status(404).json({status: true, message: "Invalid Credentials"})
     }
 
-
+    
+      const otp = await generateOTP(type,Exist._id);
+          return res.status(200).json({status: true, message: `OTP sent on ${type} Successfully`, data : otp})
    
-     return res.status(200).json({status: true, message: "Login Successfully", data : {token}})
    } catch (error) {
      return res.status(500).json({status: false, message: error.message})
    }
@@ -137,10 +159,43 @@ const resetPassword = async(req,res) => {
    }
 }
 
+const verify = async(req,res) => {
+   try {
+    const {userId, otp, type}= req.body;
+    if(!userId && !otp && !type) {
+        throw Error("pls fill required input")
+    }
+
+    const Exist = await User.findById(userId);
+
+    if(!Exist){
+      return res.status(404).json({status: true, message: "User Not Exist"})
+    }
+   const verifyOTPResult = await verifyOTP(userId, otp);
+    if(!verifyOTPResult){
+      return res.status(400).json({status: true, message: "Invalid OTP"})
+    }
+
+    if(type == "mobile"){
+      Exist.mobile_verify_at = new Date();
+    }
+    if(type == "email"){
+      Exist.email_verify_at = new Date();
+    }
+    await Exist.save();
+
+  const token = generateToken(Exist)
+   
+     return res.status(200).json({status: true, message: "OTP Verified Successfully", data : {token}})
+   } catch (error) {
+     return res.status(500).json({status: false, message: error.message})
+   }
+}
 
 module.exports = {
     register,
     login,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    verify
 }

@@ -1,6 +1,14 @@
+import { useEffect } from "react";
 import { Link, Outlet } from "react-router-dom"
 
 const AuthLayout = () => {
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if(token){
+      window.location.href = "/"
+    }
+  },[])
 
     return (
         <>

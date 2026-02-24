@@ -1,8 +1,7 @@
-const sendMessage = require("../services/twilio");
-const sendMail = require("../services/bravo");
-
 const OTPModel = require("../models/Otp");
 const UserModel = require("../models/User");
+const { sendOTPEmail } = require("../services/mail");
+const { sendMessage } = require("../services/twilio");
 
 const generateOTP = async (type,userId) => {
     console.log(type, userId);
@@ -16,12 +15,15 @@ const generateOTP = async (type,userId) => {
     await OTPModel.create({userId, otp, expiresAt});
 
     const message = `Your Verifcation OTP is : ${otp}`;
-     if(type== "mobile"){
-        await sendMessage(User.mobile, message)
-     }else{
-        await sendMail(User.email," Verifcation Code", message)
-     }
 
+    if(type=="mobile"){
+        await sendMessage(User.mobile,message);
+    }
+
+      if(type=="email"){
+        await sendOTPEmail(User.email,message);
+    }
+  
      return {type, expiresAt, userId} 
 }
 
